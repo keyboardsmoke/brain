@@ -358,3 +358,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Test tiles
+Resources/Tiny16
+Resources/16x16RetroTileset
+Resources/Emotes
