@@ -1,8 +1,9 @@
 #pragma once
 
 #include "sdl_includes.h"
+#include <functional>
 
-typedef void (*TimerFinishedCb)(void* userdata);
+// typedef void (*TimerFinishedCb)(void* userdata);
 
 class Timer
 {
@@ -46,7 +47,7 @@ public:
 		return m_finished;
 	}
 
-	void SetFinishedCallback(TimerFinishedCb cb)
+	void SetFinishedCallback(std::function<void(void*)> cb)
 	{
 		m_cb = cb;
 	}
@@ -55,7 +56,7 @@ private:
 	unsigned int m_ms;
 	unsigned int m_startTick;
 	unsigned int m_finishedTick;
-	TimerFinishedCb m_cb;
+	std::function<void(void*)> m_cb;
 	bool m_started;
 	bool m_finished;
 };

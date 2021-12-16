@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "Timer.h"
 #include "TextureSprite.h"
@@ -8,17 +9,17 @@
 class Animation;
 class AnimationShard;
 
-typedef void (*AnimationShardFinishedCb)(AnimationShard* anim, void* userdata);
+typedef std::function<void(AnimationShard* anim, void* userdata)> AnimationCallback;
 
 class AnimationStage
 {
 public:
 	AnimationStage() = delete;
-	AnimationStage(int col, int row, int ticks) : textureCol(col), textureRow(row), ticks(ticks) {}
+	AnimationStage(int col, int row, uint32_t ticks) : textureCol(col), textureRow(row), ticks(ticks) {}
 
 	int textureCol;
 	int textureRow;
-	int ticks;
+	uint32_t ticks;
 };
 
 // A shard is just an instance of the animation with its own timer, properties, etc.
@@ -26,6 +27,27 @@ public:
 class AnimationShard
 {
 public:
+	AnimationShard() = delete;
+	AnimationShard(Animation* parentAnim) : 
+		m_parent(parentAnim) {}
+
+	void Reset();
+
+	void Tick();
+	void Render(int x, int y);
+
+	void AddStage(int col, int row, int ticks);
+	void SetCallback(AnimationCallback cb, void* userdata) { m_cb = std::make_pair(cb, userdata); }
+
+private:
+	void SetupWorkingStages();
+
+	Animation* m_parent;
+	std::vector<AnimationStage> m_stages;
+	std::vector<AnimationStage> m_workingStages;
+	std::pair<AnimationCallback, void*> m_cb;
+
+	/*
 	AnimationShard() = delete;
 	AnimationShard(Animation* parentAnim) :
 		m_parent(parentAnim),
@@ -38,7 +60,7 @@ public:
 	void Reset();
 
 	void AddStage(int col, int row, int ticks);
-	void SetCallback(AnimationShardFinishedCb cb, void* userdata) { m_cb = std::make_pair(cb, userdata); }
+	void SetCallback(AnimationCallback cb, void* userdata) { m_cb = std::make_pair(cb, userdata); }
 	void Render(int x, int y);
 
 private:
@@ -58,7 +80,8 @@ private:
 
 	Timer m_changeTimer;
 	std::vector<AnimationStage> m_stages;
-	std::pair<AnimationShardFinishedCb, void*> m_cb;
+	std::pair<AnimationCallback, void*> m_cb;
+	*/
 };
 
 class Animation

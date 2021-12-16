@@ -7,13 +7,57 @@ Animation::Animation(TextureSprite* sprite) : m_sprite(sprite)
 
 void AnimationShard::Reset()
 {
-	/*
-	m_currentStage = 0U;
+	// Just set it up new again
+	SetupWorkingStages();
+}
 
+void AnimationShard::Tick()
+{
+	// Do nothing
 	if (m_stages.empty())
 		return;
 
-	// m_changeTimer.Start(m_stages[m_currentStage].ticks);*/
+	const uint32_t currentTick = SDL_GetTicks();
+
+	if (m_workingStages.empty())
+	{
+		SetupWorkingStages();
+	}
+
+	AnimationStage& currentStage = m_workingStages.front();
+
+	// If the ticks equals or exceeds the stored tick, it's finished
+	uint32_t storedRefreshTime = currentStage.ticks;
+
+	if (storedRefreshTime < currentTick)
+	{
+		// Remove the first entry when the time is exceeded
+		m_workingStages.erase(m_workingStages.begin());
+
+		if (m_workingStages.empty())
+		{
+			// We're finished, callback
+			if (m_cb.first != nullptr)
+			{
+				m_cb.first(this, m_cb.second);
+			}
+
+			// We should fill the working stages again here though
+			SetupWorkingStages();
+		}
+	}
+}
+
+void AnimationShard::Render(int x, int y)
+{
+	// Nothing to do
+	if (m_workingStages.empty())
+		return;
+
+	AnimationStage& stage = m_workingStages.front();
+
+	// Play what we've got
+	m_parent->GetTextureSprite()->RenderFrame(x, y, stage.textureCol, stage.textureRow);
 }
 
 void AnimationShard::AddStage(int col, int row, int ticks)
@@ -21,74 +65,22 @@ void AnimationShard::AddStage(int col, int row, int ticks)
 	m_stages.emplace_back(col, row, ticks);
 }
 
-void AnimationShard::Render(int x, int y)
+void AnimationShard::SetupWorkingStages()
 {
-	const unsigned int currentTick = SDL_GetTicks();
+	m_workingStages.clear();
 
-	// Some not at all needed optimizations
-	if (m_stages.empty())
-		return;
+	const uint32_t currentTick = SDL_GetTicks();
 
-	if (m_stages.size() == 1)
+	m_workingStages.reserve(m_stages.size());
+
+	uint32_t offset = 0u;
+
+	for (auto& e : m_stages)
 	{
-		m_parent->GetTextureSprite()->RenderFrame(x, y, m_stages[0].textureCol, m_stages[0].textureRow);
+		const uint32_t stageTime = currentTick + e.ticks + offset;
 
-		if (!m_changeTimer.IsStarted())
-		{
-			printf("Not started.\n");
+		m_workingStages.emplace_back(e.textureCol, e.textureRow, stageTime);
 
-			m_changeTimer.Start(m_stages[0].ticks);
-			m_changeTimer.SetFinishedCallback([](void* userdata) -> void
-			{
-				printf("Single changeTimer cb\n");
-
-				AnimationShard* s = reinterpret_cast<AnimationShard*>(userdata);
-
-				if (s->m_cb.first != nullptr) { s->m_cb.first(s, s->m_cb.second); }
-			});
-		}
-		else
-		{
-			printf("Running timer...\n");
-
-			m_changeTimer.Run(this);
-		}
-
-		return;
+		offset += e.ticks;
 	}
-
-	// Here's the meat
-	unsigned int nextStage = m_currentStage + 1;
-
-	AnimationStage& stage = m_stages[m_currentStage];
-
-	// Play what we've got
-	m_parent->GetTextureSprite()->RenderFrame(x, y, stage.textureCol, stage.textureRow);
-
-	if (m_currentStage == 0U && m_changeTimer.IsStarted() == false)
-	{
-		m_changeTimer.Start(stage.ticks);
-	}
-
-	m_changeTimer.Run(nullptr);
-
-	// We're not doing anything
-	if (!m_changeTimer.IsFinished())
-		return;
-
-	// We rendered the final frame of the animation
-	if (IsFinalFrame())
-	{
-		if (m_cb.first != nullptr)
-		{
-			m_cb.first(this, m_cb.second);
-		}
-
-		nextStage = 0U;
-	}
-
-	// We're switching to a new animation
-	m_currentStage = nextStage;
-
-	m_changeTimer.Start(m_stages[m_currentStage].ticks);
 }

@@ -10,7 +10,12 @@ class PlayerEntity : public WorldEntity
 
 public:
 	PlayerEntity() = delete;
-	PlayerEntity(uint16_t col, uint16_t row) :
+	PlayerEntity(const SDL_Color& color, uint16_t col, uint16_t row) :
+		m_color(color), m_sprite(nullptr),
+		m_idleDownAnim(nullptr), m_idleLeftAnim(nullptr), m_idleRightAnim(nullptr), m_idleUpAnim(nullptr),
+		m_movingDownAnim(nullptr), m_movingLeftAnim(nullptr), m_movingRightAnim(nullptr), m_movingUpAnim(nullptr),
+		m_anim(nullptr), m_currentAnimShard(nullptr), m_health(1.0f), m_hunger(0.0f), m_thirst(0.0f), m_speed(1.0f),
+		m_neuralEnt(nullptr),
 		WorldEntity(col, row) {}
 
 	bool Initialize() override;
@@ -43,7 +48,11 @@ public:
 	void SetSpeed(float speed) { m_speed = speed; }
 
 private:
+	void SetAnimationShard(AnimationShard* shard);
 	void SetAnimationForDirection(Direction dir);
+
+	// Color
+	SDL_Color m_color;
 
 	// TextureSprite as a basis for the animations below
 	TextureSprite* m_sprite;

@@ -10,7 +10,7 @@ public:
 	WaterEntity(const uint16_t column, const uint16_t row) : m_sprite(nullptr), m_anim(nullptr), m_currentAnimShard(nullptr), WorldEntity(column, row) {}
 
 	bool Initialize() override;
-	void Tick() override {}
+	void Tick() override;
 	void Render() override;
 	bool Walkable() override { return false; }
 	void Interact(Entity* other) override;

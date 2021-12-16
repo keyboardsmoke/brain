@@ -15,6 +15,8 @@ bool PlayerEntity::Initialize()
 		return false;
 	}
 
+	SDL_SetTextureColorMod(m_sprite->GetTexture()->GetSDLTexture(), m_color.r, m_color.g, m_color.b);
+
 	m_anim = new Animation(m_sprite);
 
 	if (!m_anim)
@@ -28,41 +30,47 @@ bool PlayerEntity::Initialize()
 	m_idleUpAnim = m_anim->CreateShard();
 
 	m_idleDownAnim->AddStage(1, 0, 1000);
-	m_idleDownAnim->Reset();
-
 	m_idleLeftAnim->AddStage(1, 1, 1000);
-	m_idleLeftAnim->Reset();
-
 	m_idleRightAnim->AddStage(1, 2, 1000);
-	m_idleRightAnim->Reset();
 
 	m_idleUpAnim->AddStage(1, 3, 1000);
-	m_idleUpAnim->Reset();
 
 	m_movingDownAnim = m_anim->CreateShard();
 	m_movingLeftAnim = m_anim->CreateShard();
 	m_movingRightAnim = m_anim->CreateShard();
 	m_movingUpAnim = m_anim->CreateShard();
 
-	m_movingDownAnim->AddStage(0, 0, 300);
-	m_movingDownAnim->AddStage(1, 0, 300);
-	m_movingDownAnim->AddStage(2, 0, 300);
-	m_movingDownAnim->Reset();
+	m_movingDownAnim->AddStage(0, 0, 200);
+	m_movingDownAnim->AddStage(1, 0, 200);
+	m_movingDownAnim->AddStage(2, 0, 200);
+	m_movingDownAnim->SetCallback([&](AnimationShard* anim, void* userdata) -> void
+	{
+		m_currentAnimShard = reinterpret_cast<AnimationShard*>(userdata);
+	}, m_idleDownAnim);
 
-	m_movingLeftAnim->AddStage(0, 1, 300);
-	m_movingLeftAnim->AddStage(1, 1, 300);
-	m_movingLeftAnim->AddStage(2, 1, 300);
-	m_movingLeftAnim->Reset();
+	m_movingLeftAnim->AddStage(0, 1, 200);
+	m_movingLeftAnim->AddStage(1, 1, 200);
+	m_movingLeftAnim->AddStage(2, 1, 200);
+	m_movingLeftAnim->SetCallback([&](AnimationShard* anim, void* userdata) -> void
+	{
+		m_currentAnimShard = reinterpret_cast<AnimationShard*>(userdata);
+	}, m_idleLeftAnim);
 
-	m_movingRightAnim->AddStage(0, 2, 300);
-	m_movingRightAnim->AddStage(1, 2, 300);
-	m_movingRightAnim->AddStage(2, 2, 300);
-	m_movingRightAnim->Reset();
+	m_movingRightAnim->AddStage(0, 2, 200);
+	m_movingRightAnim->AddStage(1, 2, 200);
+	m_movingRightAnim->AddStage(2, 2, 200);
+	m_movingRightAnim->SetCallback([&](AnimationShard* anim, void* userdata) -> void
+	{
+		m_currentAnimShard = reinterpret_cast<AnimationShard*>(userdata);
+	}, m_idleRightAnim);
 
-	m_movingUpAnim->AddStage(0, 3, 300);
-	m_movingUpAnim->AddStage(1, 3, 300);
-	m_movingUpAnim->AddStage(2, 3, 300);
-	m_movingUpAnim->Reset();
+	m_movingUpAnim->AddStage(0, 3, 200);
+	m_movingUpAnim->AddStage(1, 3, 200);
+	m_movingUpAnim->AddStage(2, 3, 200);
+	m_movingUpAnim->SetCallback([&](AnimationShard* anim, void* userdata) -> void
+	{
+		m_currentAnimShard = reinterpret_cast<AnimationShard*>(userdata);
+	}, m_idleUpAnim);
 
 	m_currentAnimShard = m_idleDownAnim;
 	// m_currentAnimShard = m_movingDownAnim;
@@ -72,6 +80,11 @@ bool PlayerEntity::Initialize()
 
 void PlayerEntity::Tick()
 {
+	if (m_currentAnimShard != nullptr)
+	{
+		m_currentAnimShard->Tick();
+	}
+
 	// Ever increasing
 	// m_hunger += 0.05f;
 	// m_thirst += 0.02f;
@@ -87,18 +100,6 @@ void PlayerEntity::Render()
 void PlayerEntity::Interact(Entity* other)
 {
 
-}
-
-static void SetMoveDirectionAnim(AnimationShard* anim, AnimationShard* newStateMovingAnim, AnimationShard* newStateIdleAnim)
-{
-	// For some reason it's not playing the animations?...
-
-	anim = newStateMovingAnim;
-	anim->Reset();
-	anim->SetCallback([](AnimationShard* anim, void* userdata) -> void
-	{
-		anim = reinterpret_cast<AnimationShard*>(userdata);
-	}, newStateIdleAnim);
 }
 
 void PlayerEntity::MoveLeft()
@@ -149,21 +150,34 @@ bool PlayerEntity::IsIdle()
 		);
 }
 
+void PlayerEntity::SetAnimationShard(AnimationShard* shard)
+{
+	// Don't bother
+	if (m_currentAnimShard == shard)
+		return;
+
+	shard->Reset();
+
+	m_currentAnimShard = shard;
+}
+
 void PlayerEntity::SetAnimationForDirection(Direction dir)
 {
+	printf("Moving [%d]\n", dir);
+
 	switch (dir)
 	{
 	case Direction::DOWN:
-		SetMoveDirectionAnim(m_currentAnimShard, m_movingDownAnim, m_idleDownAnim);
+		SetAnimationShard(m_movingDownAnim);
 		break;
 	case Direction::LEFT:
-		SetMoveDirectionAnim(m_currentAnimShard, m_movingLeftAnim, m_idleLeftAnim);
+		SetAnimationShard(m_movingLeftAnim);
 		break;
 	case Direction::RIGHT:
-		SetMoveDirectionAnim(m_currentAnimShard, m_movingRightAnim, m_idleRightAnim);
+		SetAnimationShard(m_movingRightAnim);
 		break;
 	case Direction::UP:
-		SetMoveDirectionAnim(m_currentAnimShard, m_movingUpAnim, m_idleUpAnim);
+		SetAnimationShard(m_movingUpAnim);
 		break;
 	}
 }

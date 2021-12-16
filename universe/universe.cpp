@@ -10,28 +10,31 @@
 #include "PlayerEntity.h"
 #include "Random.h"
 
-PlayerEntity* g_playerEnt = nullptr;
+std::vector<PlayerEntity*> g_playerEntities;
 
 static void Render()
 {
-	if (g_playerEnt)
+	for (auto& pe : g_playerEntities)
 	{
-		if (!g_playerEnt->IsMoving() && g_playerEnt->IsIdle())
+		if (pe)
 		{
-			switch (Random::Value<int>(0, 3))
+			if (!pe->IsMoving() && pe->IsIdle())
 			{
-			case 0:
-				g_playerEnt->MoveUp();
-				break;
-			case 1:
-				g_playerEnt->MoveLeft();
-				break;
-			case 2:
-				g_playerEnt->MoveRight();
-				break;
-			case 3:
-				g_playerEnt->MoveDown();
-				break;
+				switch (Random::Value<int>(0, 3))
+				{
+				case 0:
+					pe->MoveUp();
+					break;
+				case 1:
+					pe->MoveLeft();
+					break;
+				case 2:
+					pe->MoveRight();
+					break;
+				case 3:
+					pe->MoveDown();
+					break;
+				}
 			}
 		}
 	}
@@ -67,14 +70,30 @@ int main()
 	}
 
 	// Add entities, or other crap we have to do
-	g_playerEnt = new PlayerEntity(4, 4);
+	// g_playerEnt = new PlayerEntity(4, 4);
+	// World::AddEntity(g_playerEnt);
 
-	World::AddEntity(g_playerEnt);
+	for (size_t i = 0; i < 4; ++i)
+	{
+		SDL_Color newPlayerColor 
+		{ 
+			Random::Value<uint8_t>(128, 255), 
+			Random::Value<uint8_t>(128, 255), 
+			Random::Value<uint8_t>(128, 255),
+			Random::Value<uint8_t>(128, 255) 
+		};
+
+		PlayerEntity* newEnt = new PlayerEntity(newPlayerColor, 4 + i, 2);
+
+		World::AddEntity(newEnt);
+
+		g_playerEntities.push_back(newEnt);
+	}
 
 	World::AddEntity(new WaterEntity(1, 1));
-	World::AddEntity(new WaterEntity(2, 1));
-	World::AddEntity(new WaterEntity(1, 2));
-	World::AddEntity(new WaterEntity(2, 2));
+	// World::AddEntity(new WaterEntity(2, 1));
+	// World::AddEntity(new WaterEntity(1, 2));
+	// World::AddEntity(new WaterEntity(2, 2));
 	
 
 	// This will loop until close

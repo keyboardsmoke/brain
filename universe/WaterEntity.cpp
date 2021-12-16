@@ -24,9 +24,16 @@ bool WaterEntity::Initialize()
 	m_currentAnimShard = m_anim->CreateShard();
 	m_currentAnimShard->AddStage(0, 0, 500);
 	m_currentAnimShard->AddStage(0, 1, 500);
-	m_currentAnimShard->Reset();
 
 	return true;
+}
+
+void WaterEntity::Tick()
+{
+	if (m_currentAnimShard != nullptr)
+	{
+		m_currentAnimShard->Tick();
+	}
 }
 
 void WaterEntity::Render()
