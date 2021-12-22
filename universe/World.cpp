@@ -233,26 +233,21 @@ static void GenerateGrass(std::unordered_map<int, std::unordered_map<int, std::p
 
 static void CreateMapEntities()
 {
-	auto& values = g_map.GetValues();
-
-	// each x/y entry in "values" is a whole col/row
-	// That's why the map's w/h is 64x48 and we are 64*16x48*16
-
-	// TODO: Something busted with map right now
-	// CBA
-	for (uint32_t c = 0; c < World::GetGridMaxColumns(); ++c)
+	for (auto& v : g_map.GetValues())
 	{
-		for (uint32_t r = 0; r < World::GetGridMaxRows(); ++r)
+		Map::EntityType type = v.second;
+
+		uint32_t x = v.first.first;
+		uint32_t y = v.first.second;
+
+		switch (type)
 		{
-			switch (values[r * c])
-			{
-			case Map::EntityType::Tree:
-				World::AddEntity(new TreeEntity(c, r, 1));
-				break;
-			case Map::EntityType::Water:
-				// World::AddEntity(new WaterEntity(c, r, 1));
-				break;
-			}
+		case Map::EntityType::Tree:
+			World::AddEntity(new TreeEntity(x, y, 1));
+			break;
+		case Map::EntityType::Water:
+			World::AddEntity(new WaterEntity(x, y, 1));
+			break;
 		}
 	}
 }

@@ -13,6 +13,14 @@ bool TreeEntity::Initialize()
 	return true;
 }
 
+void TreeEntity::Tick()
+{
+	if (m_lastFruitedTime == 0u)
+	{
+		// some point in the future, we make da fruit
+	}
+}
+
 void TreeEntity::Render()
 {
 	m_texture->Render(GetCoordX(), GetCoordY());

@@ -1,13 +1,15 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include <map>
+#include <tuple>
 
 class Map
 {
 public:
 	enum class EntityType
 	{
+		None,
 		Water,
 		Tree
 	};
@@ -20,11 +22,12 @@ public:
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }
 
-	std::unordered_map<uint32_t, EntityType>& GetValues() { return m_values; }
+	std::map<std::pair<int, int>, EntityType>& GetValues() { return m_values; }
 
 private:
 	std::string m_filename;
 	uint32_t m_width;
 	uint32_t m_height;
-	std::unordered_map<uint32_t, EntityType> m_values;
+
+	std::map<std::pair<int, int>, EntityType> m_values;
 };
