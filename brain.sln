@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "universe", "universe\univer
 		{C2A17F0F-1000-4079-92C3-4363BBDF0D94} = {C2A17F0F-1000-4079-92C3-4363BBDF0D94}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lodepng", "lodepng\lodepng.vcxproj", "{87CED227-5F4C-44A0-8E97-BC2634C01A41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -47,6 +49,14 @@ Global
 		{28E514A8-1406-4C73-B28B-16B1DAEC87AC}.Release|x64.Build.0 = Release|x64
 		{28E514A8-1406-4C73-B28B-16B1DAEC87AC}.Release|x86.ActiveCfg = Release|Win32
 		{28E514A8-1406-4C73-B28B-16B1DAEC87AC}.Release|x86.Build.0 = Release|Win32
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Debug|x64.ActiveCfg = Debug|x64
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Debug|x64.Build.0 = Debug|x64
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Debug|x86.ActiveCfg = Debug|Win32
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Debug|x86.Build.0 = Debug|Win32
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Release|x64.ActiveCfg = Release|x64
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Release|x64.Build.0 = Release|x64
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Release|x86.ActiveCfg = Release|Win32
+		{87CED227-5F4C-44A0-8E97-BC2634C01A41}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

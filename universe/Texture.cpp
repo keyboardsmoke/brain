@@ -22,7 +22,7 @@ bool Texture::Load()
 		return false;
 	}
 
-	if (SDL_QueryTexture(m_texture, nullptr, nullptr, &m_width, &m_height) != 0)
+	if (SDL_QueryTexture(m_texture, nullptr, nullptr, &m_textureWidth, &m_textureHeight) != 0)
 	{
 		printf("Unable to query texture dims [%s]\n", SDL_GetError());
 
@@ -34,6 +34,12 @@ bool Texture::Load()
 
 void Texture::Render(int x, int y)
 {
-	SDL_Rect rect = { x, y, m_width, m_height };
+	SDL_Rect rect = { x, y, m_textureWidth, m_textureHeight };
+	SDL_RenderCopy(Game::GetRenderer(), m_texture, nullptr, &rect);
+}
+
+void Texture::Render(int x, int y, int w, int h)
+{
+	SDL_Rect rect = { x, y, w, h };
 	SDL_RenderCopy(Game::GetRenderer(), m_texture, nullptr, &rect);
 }

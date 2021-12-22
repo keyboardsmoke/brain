@@ -10,32 +10,33 @@ class PlayerEntity : public WorldEntity
 
 public:
 	PlayerEntity() = delete;
-	PlayerEntity(const SDL_Color& color, uint16_t col, uint16_t row) :
+	PlayerEntity(const SDL_Color& color, const uint16_t col, const uint16_t row, const uint16_t size) :
 		m_color(color), m_sprite(nullptr),
 		m_idleDownAnim(nullptr), m_idleLeftAnim(nullptr), m_idleRightAnim(nullptr), m_idleUpAnim(nullptr),
 		m_movingDownAnim(nullptr), m_movingLeftAnim(nullptr), m_movingRightAnim(nullptr), m_movingUpAnim(nullptr),
 		m_anim(nullptr), m_currentAnimShard(nullptr), m_health(1.0f), m_hunger(0.0f), m_thirst(0.0f), m_speed(1.0f),
 		m_neuralEnt(nullptr),
-		WorldEntity(col, row) {}
+		WorldEntity(col, row, size) {}
 
 	bool Initialize() override;
 	void Tick() override;
 	void Render() override;
 	bool Walkable() override { return false; }
-	void Interact(Entity* other) override;
+	void Interact(WorldEntity* other, WorldEntityInteraction type) override;
+	void OnInteraction(WorldEntity* other, WorldEntityInteraction type) override;
 
 	// void LookLeft() override;
 	// void LookRight() override;
 	// void LookUp() override;
 	// void LookDown() override;
 
-	void MoveLeft() override;
-	void MoveRight() override;
-	void MoveUp() override;
-	void MoveDown() override;
+	bool MoveLeft() override;
+	bool MoveRight() override;
+	bool MoveUp() override;
+	bool MoveDown() override;
 
-	bool IsMoving();
-	bool IsIdle();
+	bool IsMoving() override;
+	bool IsIdle() override;
 
 	float GetHealth() const { return m_health; }
 	float GetHunger() const { return m_hunger; }
@@ -46,10 +47,13 @@ public:
 	void SetHunger(float hunger) { m_hunger = hunger; }
 	void SetThirst(float thirst) { m_thirst = thirst; }
 	void SetSpeed(float speed) { m_speed = speed; }
+	
+	bool CanReach(uint16_t col, uint16_t row);
+	bool CanMove(uint16_t col, uint16_t row);
 
 private:
 	void SetAnimationShard(AnimationShard* shard);
-	void SetAnimationForDirection(Direction dir);
+	void SetAnimationForDirection();
 
 	// Color
 	SDL_Color m_color;

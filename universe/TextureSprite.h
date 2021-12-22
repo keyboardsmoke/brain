@@ -13,6 +13,7 @@ public:
 
 	bool Load() { return m_texture.Load(); }
 	void RenderFrame(int x, int y, int frameCol, int frameRow);
+	void RenderFrame(int x, int y, int w, int h, int frameCol, int frameRow);
 
 	Texture* GetTexture() { return &m_texture; }
 

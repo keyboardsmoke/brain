@@ -10,7 +10,50 @@
 #include "PlayerEntity.h"
 #include "Random.h"
 
+#include <random>
+#include <functional>
+
 std::vector<PlayerEntity*> g_playerEntities;
+
+auto rng = std::default_random_engine{};
+
+std::vector<int> CreateRandomMoveChanceArray()
+{
+	std::vector<int> p{ 0, 1, 2, 3 };
+	std::shuffle(p.begin(), p.end(), rng);
+	return p;
+}
+
+static void TryMove(PlayerEntity* pe)
+{
+	auto p = CreateRandomMoveChanceArray();
+
+	std::function<bool(PlayerEntity*)> fn[] =
+	{
+		[](PlayerEntity* pe) -> bool 
+		{
+			return pe->MoveUp();
+		},
+		[](PlayerEntity* pe) -> bool
+		{
+			return pe->MoveDown();
+		},
+		[](PlayerEntity* pe) -> bool
+		{
+			return pe->MoveLeft();
+		},
+		[](PlayerEntity* pe) -> bool
+		{
+			return pe->MoveRight();
+		}
+	};
+
+	for (auto& t : p)
+	{
+		if (fn[t](pe))
+			break;
+	}
+}
 
 static void Render()
 {
@@ -18,24 +61,10 @@ static void Render()
 	{
 		if (pe)
 		{
-			if (!pe->IsMoving() && pe->IsIdle())
-			{
-				switch (Random::Value<int>(0, 3))
-				{
-				case 0:
-					pe->MoveUp();
-					break;
-				case 1:
-					pe->MoveLeft();
-					break;
-				case 2:
-					pe->MoveRight();
-					break;
-				case 3:
-					pe->MoveDown();
-					break;
-				}
-			}
+			if (pe->IsMoving())
+				continue;
+
+			TryMove(pe);
 		}
 	}
 
@@ -69,11 +98,11 @@ int main()
 		return false;
 	}
 
-	// Add entities, or other crap we have to do
-	// g_playerEnt = new PlayerEntity(4, 4);
-	// World::AddEntity(g_playerEnt);
+	// size 1 only one supported until I rework the collision system...
+	// speed is also broken until I'm able to get animation shards slowing/speeding up without breaking other stuff
+	// ....
 
-	for (size_t i = 0; i < 4; ++i)
+	for (uint16_t i = 0; i < 4; ++i)
 	{
 		SDL_Color newPlayerColor 
 		{ 
@@ -83,18 +112,12 @@ int main()
 			Random::Value<uint8_t>(128, 255) 
 		};
 
-		PlayerEntity* newEnt = new PlayerEntity(newPlayerColor, 4 + i, 2);
+		PlayerEntity* newEnt = new PlayerEntity(newPlayerColor, 4 + i, 2, 1);
 
 		World::AddEntity(newEnt);
 
 		g_playerEntities.push_back(newEnt);
 	}
-
-	World::AddEntity(new WaterEntity(1, 1));
-	// World::AddEntity(new WaterEntity(2, 1));
-	// World::AddEntity(new WaterEntity(1, 2));
-	// World::AddEntity(new WaterEntity(2, 2));
-	
 
 	// This will loop until close
 	Game::Render();

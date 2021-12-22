@@ -60,9 +60,36 @@ void AnimationShard::Render(int x, int y)
 	m_parent->GetTextureSprite()->RenderFrame(x, y, stage.textureCol, stage.textureRow);
 }
 
+void AnimationShard::Render(int x, int y, int w, int h)
+{
+	// Nothing to do
+	if (m_workingStages.empty())
+		return;
+
+	AnimationStage& stage = m_workingStages.front();
+
+	// Play what we've got
+	m_parent->GetTextureSprite()->RenderFrame(x, y, w, h, stage.textureCol, stage.textureRow);
+}
+
 void AnimationShard::AddStage(int col, int row, int ticks)
 {
+	m_totalTicks += ticks;
+
 	m_stages.emplace_back(col, row, ticks);
+}
+
+uint32_t AnimationShard::GetTotalTicks()
+{
+	return m_totalTicks;
+}
+
+uint32_t AnimationShard::GetRemainingTicks()
+{
+	if (m_workingStages.empty())
+		return 0u;
+
+	return m_workingStages.back().ticks - SDL_GetTicks();
 }
 
 void AnimationShard::SetupWorkingStages()

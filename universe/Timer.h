@@ -52,10 +52,20 @@ public:
 		m_cb = cb;
 	}
 
+	unsigned RemainingTicks()
+	{
+		if (!IsStarted() || (IsStarted() && IsFinished()))
+			return 0u;
+
+		const unsigned ticks = SDL_GetTicks();
+
+		return m_finishedTick - ticks;
+	}
+
 private:
-	unsigned int m_ms;
-	unsigned int m_startTick;
-	unsigned int m_finishedTick;
+	unsigned m_ms;
+	unsigned m_startTick;
+	unsigned m_finishedTick;
 	std::function<void(void*)> m_cb;
 	bool m_started;
 	bool m_finished;

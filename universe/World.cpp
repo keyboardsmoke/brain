@@ -6,13 +6,17 @@
 #include "Random.h"
 #include "PerlinNoise.h"
 #include "WorldEntity.h"
+#include "TreeEntity.h"
+#include "WaterEntity.h"
+#include "Map.h"
 
 #define GRID_SIZE 16
 
 std::vector<Entity*> g_entities;
 std::unordered_map<Entity*, std::pair<uint16_t, uint16_t>> g_entityPositions;
+Map g_map("../Resources/map.png");
 
-TextureSprite tiles("../Resources/Tiny16/basictiles.png", GRID_SIZE);
+TextureSprite g_grassTiles("../Resources/grass.png", GRID_SIZE);
 
 static std::unordered_map<int, std::unordered_map<int, std::pair<int, int>>> GrassTiles;
 
@@ -29,12 +33,12 @@ void World::GetGridDims(uint16_t& cols, uint16_t& rows)
 
 uint16_t World::GetGridMaxColumns()
 {
-	return Game::GetWindowRect().w / GRID_SIZE;
+	return (Game::GetWindowRect().w / GRID_SIZE) - 1;
 }
 
 uint16_t World::GetGridMaxRows()
 {
-	return Game::GetWindowRect().h / GRID_SIZE;
+	return (Game::GetWindowRect().h / GRID_SIZE) - 1;
 }
 
 bool World::IsValidGridPosition(uint16_t col, uint16_t row)
@@ -147,7 +151,7 @@ static void RenderGrass()
 		{
 			std::pair<int, int>& rc = GrassTiles[w][h];
 
-			tiles.RenderFrame(w, h, rc.first, rc.second);
+			g_grassTiles.RenderFrame(w, h, rc.first, rc.second);
 		}
 	}
 }
@@ -211,18 +215,10 @@ static void GenerateGrass(std::unordered_map<int, std::unordered_map<int, std::p
 			// Typical Perlin noise
 			double n = pn.noise(5 * x, 5 * y, 0.8);
 
-			// Wood like structure
-			// n = 20 * pn.noise(x, y, 0.8);
-			// n = n - floor(n);
-
 			int ground[][2] =
 			{
-				{ 0, 8 }, // grass short
-				{ 1, 8 }, // grass long
-
-				// We should add any other things on top of grass after the fact
-				// { 4, 1 }, // flowers
-				// { 3, 1 }, // plain
+				{ 0, 0 }, // grass short
+				{ 1, 0 }, // grass long
 			};
 
 			unsigned count = _countof(ground);
@@ -235,15 +231,35 @@ static void GenerateGrass(std::unordered_map<int, std::unordered_map<int, std::p
 	}
 }
 
-TextureSprite* World::GetTileSprite(int idx)
+static void CreateMapEntities()
 {
-	// no idx switch atm
-	return &tiles;
+	auto& values = g_map.GetValues();
+
+	// each x/y entry in "values" is a whole col/row
+	// That's why the map's w/h is 64x48 and we are 64*16x48*16
+
+	// TODO: Something busted with map right now
+	// CBA
+	for (uint32_t c = 0; c < World::GetGridMaxColumns(); ++c)
+	{
+		for (uint32_t r = 0; r < World::GetGridMaxRows(); ++r)
+		{
+			switch (values[r * c])
+			{
+			case Map::EntityType::Tree:
+				World::AddEntity(new TreeEntity(c, r, 1));
+				break;
+			case Map::EntityType::Water:
+				// World::AddEntity(new WaterEntity(c, r, 1));
+				break;
+			}
+		}
+	}
 }
 
 bool World::Initialize()
 {
-	if (!tiles.Load())
+	if (!g_grassTiles.Load())
 	{
 		printf("Unable to load world tiles.\n");
 
@@ -251,8 +267,37 @@ bool World::Initialize()
 	}
 
 	GenerateGrass(&GrassTiles);
+	// GenerateTrees();
+
+	uint16_t cols = 0, rows = 0;
+	GetGridDims(cols, rows);
+
+	printf("Columns [%d] Rows [%d]\n", cols + 1, rows + 1);
 
 	// Need to generate some world items to interact with here, then we need some way for entity to interact...
+
+	if (!g_map.Load())
+	{
+		printf("Failed to load map.\n");
+
+		return false;
+	}
+
+	if (g_map.GetHeight() != (rows + 1))
+	{
+		printf("Invalid number of cols for world map.\n");
+
+		return false;
+	}
+
+	if (g_map.GetWidth() != (cols + 1))
+	{
+		printf("Invalid number of rows for world map.\n");
+
+		return false;
+	}
+
+	CreateMapEntities();
 
 	return true;
 }

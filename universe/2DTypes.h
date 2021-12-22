@@ -134,6 +134,26 @@ struct Point2D
 	T x, y;
 };
 
+template<typename T>
+struct Rect2D
+{
+	Rect2D() : pos(), width(0), height(0) {}
+	Rect2D(T x, T y, T w, T h) : pos(x, y), width(w), height(h) {}
+
+	Point2D<T> pos;
+
+	bool IsPointWithin(T x, T y) const
+	{
+		T bx = pos.x + width;
+		T by = pos.y + height;
+
+		return ((x >= pos.x && y >= pos.y) && (x < bx && y < by));
+	}
+
+	T width;
+	T height;
+};
+
 enum class Direction
 {
 	UP, DOWN, LEFT, RIGHT

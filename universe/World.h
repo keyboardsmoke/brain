@@ -24,6 +24,4 @@ public:
 	static bool Initialize();
 	static void Tick();
 	static void Render();
-	
-	static TextureSprite* GetTileSprite(int idx);
 };

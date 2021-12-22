@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <unordered_map>
 
 SDL_Window* g_window = nullptr;
 SDL_Renderer* g_renderer = nullptr;
@@ -47,6 +48,23 @@ const float Game::GetWindowScale()
 	return g_renderScale;
 }
 
+static bool GetSupportedRenderers(std::unordered_map<std::string, int>& supportedDrivers)
+{
+	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
+	{
+		SDL_RendererInfo rendererInfo = {};
+		if (SDL_GetRenderDriverInfo(i, &rendererInfo) != 0)
+			return false;
+
+		if (rendererInfo.name == nullptr)
+			return false;
+
+		supportedDrivers[rendererInfo.name] = i;
+	}
+	
+	return true;
+}
+
 bool Game::Initialize(const std::string& windowName, const SDL_Rect& windowRect, const char** errorMsg, float renderScale)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -54,6 +72,11 @@ bool Game::Initialize(const std::string& windowName, const SDL_Rect& windowRect,
 		*errorMsg = SDL_GetError();
 
 		return false;
+	}
+
+	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
+	{
+		printf("Warning: Nearest pixel texture filtering not enabled!\n");
 	}
 
 	g_window = SDL_CreateWindow(windowName.c_str(), // creates a window 
@@ -64,6 +87,35 @@ bool Game::Initialize(const std::string& windowName, const SDL_Rect& windowRect,
 		*errorMsg = SDL_GetError();
 
 		return false;
+	}
+
+	std::unordered_map<std::string, int> renderers;
+
+	if (!GetSupportedRenderers(renderers))
+	{
+		*errorMsg = SDL_GetError();
+
+		return false;
+	}
+
+	/*
+ *  This variable is case insensitive and can be set to the following values:
+ *    "direct3d"
+ *    "opengl"
+ *    "opengles2"
+ *    "opengles"
+ *    "metal"
+ *    "software"
+ 
+	Supported Renderer [direct3d]
+	Supported Renderer [opengl]
+	Supported Renderer [software]
+	Supported Renderer [opengles2]
+	*/
+
+	for (auto r : renderers)
+	{
+		printf("Supported Renderer [%s]\n", r.first.c_str());
 	}
 
 	Uint32 render_flags = SDL_RENDERER_ACCELERATED;

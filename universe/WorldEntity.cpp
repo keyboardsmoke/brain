@@ -1,76 +1,92 @@
 #include "WorldEntity.h"
 
-static bool CanMove(uint16_t currentCol, uint16_t currentRow, uint16_t newCol, uint16_t newRow)
+bool WorldEntity::MoveLeft()
 {
-	Entity* existingEntity = World::LookupEntityAtPosition(newCol, newRow);
+	if (GetColumn() == 0u)
+		return false;
 
-	if (WorldEntity* we = dynamic_cast<WorldEntity*>(existingEntity))
+	if (CanMove(GetColumn() - 1, GetRow()))
 	{
-		if (we->Walkable() == false)
-		{
-			return false;
-		}
-	}
+		LookLeft();
 
-	return true;
-}
-
-void WorldEntity::MoveLeft()
-{
-	LookLeft();
-
-	if (m_column == 0u)
-		return;
-
-	if (CanMove(m_column, m_row, m_column - 1, m_row))
-	{
-		--m_column;
+		SetColumn(GetColumn() - 1);
 
 		World::UpdateEntity(this);
+
+		return true;
 	}
+
+	return false;
 }
 
-void WorldEntity::MoveRight()
+bool WorldEntity::MoveRight()
 {
-	LookRight();
+	if (GetColumn() == World::GetGridMaxColumns())
+		return false;
 
-	if (m_column == World::GetGridMaxColumns())
-		return;
-
-	if (CanMove(m_column, m_row, m_column + 1, m_row))
+	if (CanMove(GetColumn() + 1, GetRow()))
 	{
-		++m_column;
+		LookRight();
+
+		SetColumn(GetColumn() + 1);
 
 		World::UpdateEntity(this);
+
+		return true;
 	}
+
+	return false;
 }
 
-void WorldEntity::MoveUp()
+bool WorldEntity::MoveUp()
 {
-	LookUp();
+	if (GetRow() == 0u)
+		return false;
 
-	if (m_row == 0u)
-		return;
-
-	if (CanMove(m_column, m_row, m_column, m_row - 1))
+	if (CanMove(GetColumn(), GetRow() - 1))
 	{
-		--m_row;
+		LookUp();
+
+		SetRow(GetRow() - 1);
 
 		World::UpdateEntity(this);
+
+		return true;
 	}
+
+	return false;
 }
 
-void WorldEntity::MoveDown()
+bool WorldEntity::MoveDown()
 {
-	LookDown();
+	if (GetRow() == World::GetGridMaxRows())
+		return false;
 
-	if (m_row == World::GetGridMaxRows())
-		return;
-
-	if (CanMove(m_column, m_row, m_column, m_row + 1))
+	if (CanMove(GetColumn(), GetRow() + 1))
 	{
-		++m_row;
+		LookDown();
+
+		SetRow(GetRow() + 1);
 
 		World::UpdateEntity(this);
+
+		return true;
 	}
+
+	return false;
+}
+
+bool WorldEntity::IsMoving()
+{
+	return false; // return (!m_movementTimer.IsStarted() || (m_movementTimer.IsStarted() && m_movementTimer.IsFinished()));
+}
+
+bool WorldEntity::IsIdle()
+{
+	return !IsMoving();
+}
+
+bool WorldEntity::CanMove(uint16_t col, uint16_t row)
+{
+	return World::IsValidGridPosition(col, row);
 }

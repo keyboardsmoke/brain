@@ -44,19 +44,22 @@ void WaterEntity::Render()
 
 	SDL_Rect waterRect = 
 	{ 
-		GetPositionX(), 
-		GetPositionY(), 
+		GetCoordX(), 
+		GetCoordY(), 
 		static_cast<int>(World::GetGridSize()), 
 		static_cast<int>(World::GetGridSize()) 
 	};
 
 	SDL_RenderFillRect(Game::GetRenderer(), &waterRect);
 
-	m_currentAnimShard->Render(GetPositionX(), GetPositionY());
+	m_currentAnimShard->Render(GetCoordX(), GetCoordY());
 }
 
-void WaterEntity::Interact(Entity* other)
+void WaterEntity::OnInteraction(WorldEntity* other, WorldEntityInteraction type)
 {
+	if (type != WorldEntityInteraction::DRINK)
+		return;
+
 	if (PlayerEntity* p = dynamic_cast<PlayerEntity*>(other))
 	{
 		// Eliminate it, unlike food this is a lake we're talking about

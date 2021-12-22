@@ -29,19 +29,24 @@ class AnimationShard
 public:
 	AnimationShard() = delete;
 	AnimationShard(Animation* parentAnim) : 
-		m_parent(parentAnim) {}
+		m_totalTicks(0u), m_parent(parentAnim) {}
 
 	void Reset();
 
 	void Tick();
 	void Render(int x, int y);
+	void Render(int x, int y, int w, int h);
 
 	void AddStage(int col, int row, int ticks);
-	void SetCallback(AnimationCallback cb, void* userdata) { m_cb = std::make_pair(cb, userdata); }
+	void SetCallback(AnimationCallback cb, void* userdata = nullptr) { m_cb = std::make_pair(cb, userdata); }
+
+	uint32_t GetTotalTicks();
+	uint32_t GetRemainingTicks();
 
 private:
 	void SetupWorkingStages();
 
+	uint32_t m_totalTicks;
 	Animation* m_parent;
 	std::vector<AnimationStage> m_stages;
 	std::vector<AnimationStage> m_workingStages;

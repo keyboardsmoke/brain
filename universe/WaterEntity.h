@@ -7,13 +7,14 @@ class WaterEntity : public WorldEntity
 {
 public:
 	WaterEntity() : m_sprite(nullptr), m_anim(nullptr), m_currentAnimShard(nullptr), WorldEntity() {}
-	WaterEntity(const uint16_t column, const uint16_t row) : m_sprite(nullptr), m_anim(nullptr), m_currentAnimShard(nullptr), WorldEntity(column, row) {}
+	WaterEntity(const uint16_t column, const uint16_t row, const uint16_t size) : 
+		m_sprite(nullptr), m_anim(nullptr), m_currentAnimShard(nullptr), WorldEntity(column, row, size) {}
 
 	bool Initialize() override;
 	void Tick() override;
 	void Render() override;
 	bool Walkable() override { return false; }
-	void Interact(Entity* other) override;
+	void OnInteraction(WorldEntity* other, WorldEntityInteraction type) override;
 
 private:
 
