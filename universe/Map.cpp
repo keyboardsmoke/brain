@@ -1,6 +1,5 @@
 #include "Map.h"
 #include "sdl_includes.h"
-#include <lodepng.h>
 
 static inline uint32_t GetSurfacePixel(SDL_Surface* surface, uint32_t x, uint32_t y)
 {

@@ -165,7 +165,6 @@
     <ClInclude Include="InterNeuron.h" />
     <ClInclude Include="MotorNeuron.h" />
     <ClInclude Include="Neuron.h" />
-    <ClInclude Include="PerlinNoise.h" />
     <ClInclude Include="PointerContainer.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Sensor.h" />
@@ -175,7 +174,6 @@
   <ItemGroup>
     <ClCompile Include="Brain.cpp" />
     <ClCompile Include="NeuralEntity.cpp" />
-    <ClCompile Include="PerlinNoise.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Sensor.cpp" />
     <ClCompile Include="SensoryNeuron.cpp" />

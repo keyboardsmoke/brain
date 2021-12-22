@@ -68,9 +68,6 @@
     <ClInclude Include="Activation.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="PerlinNoise.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Brain.cpp">
@@ -86,9 +83,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Random.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="PerlinNoise.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
