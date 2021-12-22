@@ -15,10 +15,19 @@ bool TreeEntity::Initialize()
 
 void TreeEntity::Tick()
 {
-	if (m_lastFruitedTime == 0u)
+	/*
+	Uint32 nextTime = m_nextFruitedTime = SDL_GetTicks() + 3600;
+
+	if (m_nextFruitedTime == 0u)
 	{
 		// some point in the future, we make da fruit
+		m_nextFruitedTime = nextTime;
 	}
+
+	if (SDL_GetTicks() > m_nextFruitedTime)
+	{
+		m_nextFruitedTime = nextTime;
+	}*/
 }
 
 void TreeEntity::Render()

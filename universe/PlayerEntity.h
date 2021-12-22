@@ -14,7 +14,7 @@ public:
 		m_color(color), m_sprite(nullptr),
 		m_idleDownAnim(nullptr), m_idleLeftAnim(nullptr), m_idleRightAnim(nullptr), m_idleUpAnim(nullptr),
 		m_movingDownAnim(nullptr), m_movingLeftAnim(nullptr), m_movingRightAnim(nullptr), m_movingUpAnim(nullptr),
-		m_anim(nullptr), m_currentAnimShard(nullptr), m_health(1.0f), m_hunger(0.0f), m_thirst(0.0f), m_speed(1.0f),
+		m_anim(nullptr), m_currentAnimShard(nullptr), m_dead(false), m_health(1.0f), m_hunger(0.0f), m_thirst(0.0f), m_speed(1.0f),
 		m_neuralEnt(nullptr),
 		WorldEntity(col, row, size) {}
 
@@ -51,6 +51,9 @@ public:
 	bool CanReach(uint16_t col, uint16_t row);
 	bool CanMove(uint16_t col, uint16_t row);
 
+	void Die();
+	bool IsReadyForDeletion();
+
 private:
 	void SetAnimationShard(AnimationShard* shard);
 	void SetAnimationForDirection();
@@ -60,6 +63,7 @@ private:
 
 	// TextureSprite as a basis for the animations below
 	TextureSprite* m_sprite;
+	TextureSprite* m_deadSprite;
 
 	// Loaded animations
 	AnimationShard* m_idleDownAnim;
@@ -74,11 +78,13 @@ private:
 
 	// Current animation
 	Animation* m_anim;
+
 	AnimationShard* m_currentAnimShard;
 
 	// living state of the "players" aka the simulated entities
 	// Since we don't have actual biological processes, we just have to sort of... do this
 	// I think these will end up being fed into sensory neurons, if in a different form
+	bool m_dead;
 	float m_health;
 	float m_hunger;
 	float m_thirst;

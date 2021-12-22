@@ -1,6 +1,3 @@
 [submodule "ext/doctest"]
 	path = ext/doctest
 	url = https://github.com/doctest/doctest.git
-[submodule "ext/lodepng"]
-	path = ext/lodepng
-	url = https://github.com/lvandeve/lodepng.git

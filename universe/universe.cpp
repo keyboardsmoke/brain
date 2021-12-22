@@ -9,6 +9,7 @@
 #include "WaterEntity.h"
 #include "PlayerEntity.h"
 #include "Random.h"
+#include "Timer.h"
 
 #include <random>
 #include <functional>
@@ -16,6 +17,8 @@
 std::vector<PlayerEntity*> g_playerEntities;
 
 auto rng = std::default_random_engine{};
+
+Timer g_randomKillOneTimer;
 
 std::vector<int> CreateRandomMoveChanceArray()
 {
@@ -57,6 +60,9 @@ static void TryMove(PlayerEntity* pe)
 
 static void Render()
 {
+	// lol
+	g_randomKillOneTimer.Run(nullptr);
+
 	for (auto& pe : g_playerEntities)
 	{
 		if (pe)
@@ -118,6 +124,15 @@ int main()
 
 		g_playerEntities.push_back(newEnt);
 	}
+
+	g_randomKillOneTimer.SetFinishedCallback([&](void*) -> void
+	{
+		size_t killIdx = Random::Value<size_t>(0, g_playerEntities.size());
+
+		g_playerEntities[killIdx]->Die();
+	});
+
+	g_randomKillOneTimer.Start(1000 * 4);
 
 	// This will loop until close
 	Game::Render();

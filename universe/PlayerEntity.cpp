@@ -17,12 +17,20 @@ bool PlayerEntity::Initialize()
 		return false;
 	}
 
+	m_deadSprite = new TextureSprite("../Resources/blob_dead_white.png", 16);
+
+	if (!m_deadSprite || !m_deadSprite->Load())
+	{
+		return false;
+	}
+
 	m_anim = new Animation(m_sprite);
 
 	if (!m_anim)
 	{
 		return false;
 	}
+
 
 	m_idleDownAnim = m_anim->CreateShard();
 	m_idleLeftAnim = m_anim->CreateShard();
@@ -79,11 +87,27 @@ bool PlayerEntity::Initialize()
 	m_currentAnimShard = m_idleDownAnim;
 	// m_currentAnimShard = m_movingDownAnim;
 
+	// Color modulation to give skin color
+	SDL_SetTextureColorMod(m_sprite->GetTexture()->GetSDLTexture(), m_color.r, m_color.g, m_color.b);
+	SDL_SetTextureColorMod(m_deadSprite->GetTexture()->GetSDLTexture(), m_color.r, m_color.g, m_color.b);
+
 	return true;
 }
 
 void PlayerEntity::Tick()
 {
+	if (m_dead)
+	{
+		// no more living now... :(
+		return;
+	}
+
+	if (m_health <= 0.0f)
+	{
+		Die();
+		return;
+	}
+
 	if (m_currentAnimShard != nullptr)
 	{
 		m_currentAnimShard->Tick();
@@ -110,8 +134,12 @@ static Point2D<float> GetLastPositionForDirection(Direction dir, const Point2D<f
 
 void PlayerEntity::Render()
 {
-	// Color modulation to give skin color
-	SDL_SetTextureColorMod(m_sprite->GetTexture()->GetSDLTexture(), m_color.r, m_color.g, m_color.b);
+	if (m_dead)
+	{
+		m_deadSprite->RenderFrame(GetCoordX(), GetCoordY(), 0, 0);
+
+		return;
+	}
 
 	// We have to do a trick here to render the entity moving, in a tile based system
 	// We basically have a fake x/y, but under the hood the units are still col/row
@@ -246,6 +274,9 @@ bool PlayerEntity::CanReach(uint16_t col, uint16_t row)
 
 bool PlayerEntity::CanMove(uint16_t col, uint16_t row)
 {
+	if (m_dead)
+		return false; // seemed easiest lol
+
 	// If we can't reach it, we sure can't move there
 	// if (!CanReach(col, row)) return false;
 
@@ -262,6 +293,15 @@ bool PlayerEntity::CanMove(uint16_t col, uint16_t row)
 	}
 
 	return WorldEntity::CanMove(col, row);
+}
+
+void PlayerEntity::Die()
+{
+	// dead anim?
+
+
+
+	m_dead = true;
 }
 
 void PlayerEntity::SetAnimationShard(AnimationShard* shard)
