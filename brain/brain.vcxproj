@@ -157,8 +157,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Action.h" />
     <ClInclude Include="Brain.h" />
     <ClInclude Include="Connection.h" />
+    <ClInclude Include="Layer.h" />
     <ClInclude Include="NeuralEntity.h" />
     <ClInclude Include="Gene.h" />
     <ClInclude Include="Genome.h" />
@@ -173,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Brain.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="NeuralEntity.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="Sensor.cpp" />

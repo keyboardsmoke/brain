@@ -12,6 +12,7 @@ class Entity
 public:
 	Entity() : m_column(0u), m_row(0u), m_size(1u) {}
 	Entity(const uint16_t column, const uint16_t row, const uint16_t size) : m_column(column), m_row(row), m_size(size) {}
+	virtual ~Entity() {}
 
 	// Initialization for the entity, generally when it's being created
 	virtual bool Initialize() { return true; }
@@ -24,6 +25,11 @@ public:
 	// Might need to rework this for some things, instead of "water" entities, 
 	// there's a "lake" entity that does efficient fills/draws
 	virtual void Render() = 0;
+
+	// Mark this entity for garbage collecting
+	// Usually after they're dead, eaten, etc.
+	// It'll get taken care of next tick
+	virtual bool IsReadyForDeletion() = 0;
 
 	void GetAbsolutePosition(uint16_t& x, uint16_t& y);
 	

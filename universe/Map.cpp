@@ -1,6 +1,37 @@
 #include "Map.h"
 #include "sdl_includes.h"
 
+struct MapColorKeyEntry
+{
+	Map::EntityType type;
+	uint32_t color;
+};
+
+MapColorKeyEntry g_colorKeys[] =
+{
+	{ Map::EntityType::None, 0x00000000 },
+	{ Map::EntityType::Tree, 0x000000ff },
+	{ Map::EntityType::Water, 0xffffffff }
+};
+
+static inline Map::EntityType GetEntityTypeFromColor(Uint32 x, Uint32 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+	Uint32 color = static_cast<Uint32>(r << 24 | g << 16 | b << 8 | a);
+
+	for (size_t i = 0; i < _countof(g_colorKeys); ++i)
+	{
+		if (color == g_colorKeys[i].color)
+		{
+			return g_colorKeys[i].type;
+		}
+	}
+
+	// Warning
+	printf("Unsupported entity type at [x: %d, y: %d] color = [%d, %d, %d]\n", x, y, r, g, b);
+
+	return Map::EntityType::None;
+}
+
 static inline uint32_t GetSurfacePixel(SDL_Surface* surface, uint32_t x, uint32_t y)
 {
 	int bpp = surface->format->BytesPerPixel;
@@ -49,35 +80,12 @@ bool Map::Load()
 	{
 		for (int y = 0; y < surface->h; ++y)
 		{
-			Uint8 r = 0, g = 0, b = 0, a = 0;
-
 			Uint32 pixel = GetSurfacePixel(surface, x, y);
 
+			Uint8 r = 0, g = 0, b = 0, a = 0;
 			SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
 
-			if (a == 0)
-			{
-				m_values[std::make_pair<int, int>(static_cast<int>(x), static_cast<int>(y))] = EntityType::None;
-			}
-			else if (a == 0xff)
-			{
-				if (r == 0 && g == 0 && b == 0)
-				{
-					// printf("Tree at [x: %d, y: %d]\n", x, y);
-
-					m_values[std::make_pair<int, int>(static_cast<int>(x), static_cast<int>(y))] = EntityType::Tree;
-				}
-				else if (r == 0xff && g == 0xff && b == 0xff)
-				{
-					// printf("Water at [x: %d, y: %d]\n", x, y);
-
-					m_values[std::make_pair<int, int>(static_cast<int>(x), static_cast<int>(y))] = EntityType::Water;
-				}
-				else
-				{
-					printf("Unsupported entity type at [x: %d, y: %d] color = [%d, %d, %d]\n", x, y, r, g, b);
-				}
-			}
+			m_values[std::make_pair(x, y)] = GetEntityTypeFromColor(x, y, r, g, b, a);
 		}
 	}
 

@@ -11,6 +11,8 @@ public:
 
 	void Feed(float* data);
 
+	std::vector<SensoryNeuron*>& GetSensoryNeurons() { return m_neurons; }
+
 private:
 	std::vector<SensoryNeuron*> m_neurons;
 };

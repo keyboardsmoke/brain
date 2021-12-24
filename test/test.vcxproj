@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)SDL2\include\;$(SolutionDir)SDL2_image\include\;$(SolutionDir)SDL2_ttf\include\;$(SolutionDir)SDL2_mixer\include\;$(SolutionDir)ext/doctest/doctest;$(SolutionDir)universe/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)SDL2\include\;$(SolutionDir)SDL2_image\include\;$(SolutionDir)SDL2_ttf\include\;$(SolutionDir)SDL2_mixer\include\;$(SolutionDir)ext/doctest/doctest;$(SolutionDir)universe/;$(SolutionDir)brain/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="random_tests.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="timer_tests.cpp" />
   </ItemGroup>

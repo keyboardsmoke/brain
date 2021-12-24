@@ -96,11 +96,18 @@ void World::RemoveEntity(Entity* entity)
 
 	// TODO: We need a linked list or something...
 	g_entities.erase(std::remove(g_entities.begin(), g_entities.end(), entity), g_entities.end());
+
+	delete entity;
 }
 
 void World::UpdateEntity(Entity* entity)
 {
 	g_entityPositions[entity] = std::make_pair(entity->GetColumn(), entity->GetRow());
+}
+
+std::vector<Entity*>& World::GetEntities()
+{
+	return g_entities;
 }
 
 Entity* World::LookupEntityAtPosition(uint16_t col, uint16_t row)
@@ -195,9 +202,20 @@ void World::Render()
 
 void World::Tick()
 {
-	for (auto& e : g_entities)
+	for (size_t i = 0; i < g_entities.size(); ++i)
 	{
-		e->Tick();
+		Entity* ent = g_entities[i];
+
+		if (ent->IsReadyForDeletion())
+		{
+			RemoveEntity(ent);
+
+			--i; // set us where we need to be
+
+			continue;
+		}
+
+		ent->Tick();
 	}
 }
 

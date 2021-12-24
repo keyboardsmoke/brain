@@ -24,6 +24,9 @@ class Neuron
 public:
 	virtual void Feed(float data) = 0;
 
+	std::vector<Connection>& GetAxonConnections() { return m_axonConnections; }
+	std::vector<Connection>& GetDendriteConnections() { return m_dendriteConnections; }
+
 protected:
 	// Output to connected Neurons
 	std::vector<Connection> m_axonConnections;

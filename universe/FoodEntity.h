@@ -11,6 +11,7 @@ public:
 
 	bool Initialize() override;
 	void Render() override;
+	bool IsReadyForDeletion() override { return false; }
 	bool Walkable() override { return false; }
 	void OnInteraction(WorldEntity* other, WorldEntityInteraction type) override;
 

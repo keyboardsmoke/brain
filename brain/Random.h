@@ -16,10 +16,13 @@ public:
 	}
 
 	template<typename T>
-	static T Value(T min, T max)
+	static T Integer(T min, T max)
 	{
-		return (Random::Value<T>() % (max - min + 1)) + min;
+		return (Random::Value<T>() % (max - min + static_cast<T>(1))) + min;
 	}
+
+	static float Real(float min, float max);
+	static double Real(double min, double max);
 
 	static void Bytes(void* data, size_t size);
 };

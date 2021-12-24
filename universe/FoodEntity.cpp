@@ -15,8 +15,8 @@ bool FoodEntity::Initialize()
 	uint16_t numCols = m_sprite->GetTexture()->GetTextureWidth() / World::GetGridSize();
 	uint16_t numRows = m_sprite->GetTexture()->GetTextureHeight() / World::GetGridSize();
 
-	m_foodCol = Random::Value<uint16_t>(0, numCols);
-	m_foodRow = Random::Value<uint16_t>(0, numRows);
+	m_foodCol = Random::Integer<uint16_t>(0, numCols);
+	m_foodRow = Random::Integer<uint16_t>(0, numRows);
 
 	return true;
 }

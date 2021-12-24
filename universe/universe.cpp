@@ -14,8 +14,6 @@
 #include <random>
 #include <functional>
 
-std::vector<PlayerEntity*> g_playerEntities;
-
 auto rng = std::default_random_engine{};
 
 Timer g_randomKillOneTimer;
@@ -63,9 +61,9 @@ static void Render()
 	// lol
 	g_randomKillOneTimer.Run(nullptr);
 
-	for (auto& pe : g_playerEntities)
+	for (auto& ent : World::GetEntities())
 	{
-		if (pe)
+		if (PlayerEntity* pe = dynamic_cast<PlayerEntity*>(ent))
 		{
 			if (pe->IsMoving())
 				continue;
@@ -80,6 +78,21 @@ static void Render()
 
 	// Render the world
 	World::Render();
+}
+
+static std::vector<size_t> GetPlayerIndices()
+{
+	std::vector<size_t> indices;
+
+	auto& ents = World::GetEntities();
+
+	for (size_t i = 0; i < ents.size(); ++i)
+	{
+		if (PlayerEntity* pe = dynamic_cast<PlayerEntity*>(ents[i]))
+			indices.push_back(i);
+	}
+
+	return indices;
 }
 
 int main()
@@ -108,28 +121,26 @@ int main()
 	// speed is also broken until I'm able to get animation shards slowing/speeding up without breaking other stuff
 	// ....
 
-	for (uint16_t i = 0; i < 4; ++i)
+	for (uint16_t i = 0; i < 5; ++i)
 	{
 		SDL_Color newPlayerColor 
 		{ 
-			Random::Value<uint8_t>(128, 255), 
-			Random::Value<uint8_t>(128, 255), 
-			Random::Value<uint8_t>(128, 255),
-			Random::Value<uint8_t>(128, 255) 
+			Random::Integer<uint8_t>(128, 255), 
+			Random::Integer<uint8_t>(128, 255), 
+			Random::Integer<uint8_t>(128, 255), 
+			255
 		};
 
 		PlayerEntity* newEnt = new PlayerEntity(newPlayerColor, 4 + i, 2, 1);
 
 		World::AddEntity(newEnt);
-
-		g_playerEntities.push_back(newEnt);
 	}
 
 	g_randomKillOneTimer.SetFinishedCallback([&](void*) -> void
 	{
-		size_t killIdx = Random::Value<size_t>(0, g_playerEntities.size());
-
-		g_playerEntities[killIdx]->Die();
+		auto indices = GetPlayerIndices();
+		size_t killIdx = Random::Integer<size_t>(0, indices.size() - 1);
+		dynamic_cast<PlayerEntity*>(World::GetEntities()[indices[killIdx]])->Die();
 	});
 
 	g_randomKillOneTimer.Start(1000 * 4);

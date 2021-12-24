@@ -91,6 +91,9 @@ bool PlayerEntity::Initialize()
 	SDL_SetTextureColorMod(m_sprite->GetTexture()->GetSDLTexture(), m_color.r, m_color.g, m_color.b);
 	SDL_SetTextureColorMod(m_deadSprite->GetTexture()->GetSDLTexture(), m_color.r, m_color.g, m_color.b);
 
+	SDL_SetTextureAlphaMod(m_sprite->GetTexture()->GetSDLTexture(), m_color.a);
+	SDL_SetTextureAlphaMod(m_deadSprite->GetTexture()->GetSDLTexture(), m_color.a);
+
 	return true;
 }
 
@@ -107,6 +110,8 @@ void PlayerEntity::Tick()
 		Die();
 		return;
 	}
+
+	// if (m_neuralEnt != nullptr) { m_neuralEnt->GetBrain().Think(); }
 
 	if (m_currentAnimShard != nullptr)
 	{
@@ -136,7 +141,19 @@ void PlayerEntity::Render()
 {
 	if (m_dead)
 	{
-		m_deadSprite->RenderFrame(GetCoordX(), GetCoordY(), 0, 0);
+		const uint32_t currentTick = SDL_GetTicks();
+		const uint32_t deadFinishTime = m_deadTick + DeathFadeTime;
+
+		if (deadFinishTime > currentTick)
+		{
+			const uint32_t doneTicks = deadFinishTime - currentTick;
+
+			const float doneFrac = static_cast<float>(doneTicks) / static_cast<float>(DeathFadeTime);
+
+			SDL_SetTextureAlphaMod(m_deadSprite->GetTexture()->GetSDLTexture(), static_cast<Uint8>(doneFrac * static_cast<float>(m_color.a)));
+
+			m_deadSprite->RenderFrame(GetCoordX(), GetCoordY(), 0, 0);
+		}
 
 		return;
 	}
@@ -166,6 +183,22 @@ void PlayerEntity::Render()
 	{
 		m_currentAnimShard->Render(GetCoordX(), GetCoordY(), GetCoordWidth(), GetCoordHeight());
 	}
+}
+
+bool PlayerEntity::IsReadyForDeletion()
+{
+	if (!m_dead)
+		return false;
+
+	const uint32_t currentTick = SDL_GetTicks();
+	const uint32_t deadFinishTime = m_deadTick + DeathFadeTime;
+
+	if (deadFinishTime <= currentTick)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void PlayerEntity::Interact(WorldEntity* other, WorldEntityInteraction type)
@@ -297,11 +330,8 @@ bool PlayerEntity::CanMove(uint16_t col, uint16_t row)
 
 void PlayerEntity::Die()
 {
-	// dead anim?
-
-
-
 	m_dead = true;
+	m_deadTick = SDL_GetTicks();
 }
 
 void PlayerEntity::SetAnimationShard(AnimationShard* shard)

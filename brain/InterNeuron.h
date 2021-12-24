@@ -7,4 +7,6 @@
 
 class InterNeuron : public Neuron
 {
+public:
+	void Feed(float data) override {}
 };

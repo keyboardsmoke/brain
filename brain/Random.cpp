@@ -34,6 +34,17 @@ unsigned Random::GetSeed()
     return currentSeed;
 }
 
+float Random::Real(float min, float max)
+{
+    return static_cast<float>(Random::Real(static_cast<double>(min), static_cast<double>(max)));
+}
+
+double Random::Real(double min, double max)
+{
+    std::uniform_real_distribution<> dist(min, max);
+    return dist(randomEngine);
+}
+
 void Random::Bytes(void* data, size_t size)
 {
     pointer_container<uint8_t> p(reinterpret_cast<uint8_t*>(data), size);
